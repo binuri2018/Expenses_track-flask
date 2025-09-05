@@ -1,15 +1,28 @@
 .dashboard {
-  background: white;
-  padding: 20px;
+  max-width: 600px;
+  margin: auto;
+  padding: 1rem;
+  border: 1px solid #ddd;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  margin-top: 12px;
+  background: #f9f9f9;
 }
-.dashboard button {
-  padding: 10px;
-  border-radius: 6px;
-  border: none;
-  background: #ff4d4f;
+
+.expense-form input {
+  margin-right: 0.5rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.expense-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.expense-list button {
+  background: red;
   color: white;
+  border: none;
+  padding: 0.2rem 0.5rem;
   cursor: pointer;
 }

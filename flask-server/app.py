@@ -102,6 +102,46 @@ def profile():
     return jsonify({"user": user_data}), 200
 
 # --------------------------
+# Expenses Routes
+# --------------------------
+@app.route("/api/expenses", methods=["GET"])
+@jwt_required()
+def get_expenses():
+    user_id = get_jwt_identity()
+    expenses = list(db["expenses"].find({"user_id": user_id}))
+    # Convert ObjectId to string
+    for exp in expenses:
+        exp["_id"] = str(exp["_id"])
+    return jsonify({"expenses": expenses}), 200
+
+@app.route("/api/expenses", methods=["POST"])
+@jwt_required()
+def add_expense():
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    if not data or "title" not in data or "amount" not in data:
+        return jsonify({"msg": "title and amount are required"}), 400
+
+    expense = {
+        "user_id": user_id,
+        "title": data["title"],
+        "amount": float(data["amount"])
+    }
+    res = db["expenses"].insert_one(expense)
+    expense["_id"] = str(res.inserted_id)
+    return jsonify({"msg": "Expense added", "expense": expense}), 201
+
+@app.route("/api/expenses/<expense_id>", methods=["DELETE"])
+@jwt_required()
+def delete_expense(expense_id):
+    user_id = get_jwt_identity()
+    res = db["expenses"].delete_one({"_id": ObjectId(expense_id), "user_id": user_id})
+    if res.deleted_count == 0:
+        return jsonify({"msg": "Expense not found"}), 404
+    return jsonify({"msg": "Expense deleted"}), 200
+
+
+# --------------------------
 # Run Server
 # --------------------------
 if __name__ == "__main__":
