@@ -5,7 +5,7 @@ from flask_jwt_extended import (
 )
 from flask_cors import CORS
 from bson.objectid import ObjectId
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import config
 from helpers import hash_password, verify_password
@@ -22,6 +22,7 @@ CORS(app, origins=config.CORS_ORIGINS, supports_credentials=True)
 # Safe database access
 db = mongo.cx.get_database()
 users_collection = db["users"]
+expenses_collection = db["expenses"]
 
 # --------------------------
 # Home / Health Check Route
@@ -107,38 +108,136 @@ def profile():
 @app.route("/api/expenses", methods=["GET"])
 @jwt_required()
 def get_expenses():
+    """
+    Returns user's expenses sorted by date (newest first).
+    Dates are formatted as "Aug 22, 2025".
+    """
     user_id = get_jwt_identity()
-    expenses = list(db["expenses"].find({"user_id": user_id}))
-    # Convert ObjectId to string
-    for exp in expenses:
+    cursor = expenses_collection.find({"user_id": user_id}).sort("date", -1)
+    expenses = []
+    for exp in cursor:
         exp["_id"] = str(exp["_id"])
+        # If date stored as datetime, format it; otherwise return as-is
+        if isinstance(exp.get("date"), datetime):
+            exp["date"] = exp["date"].strftime("%b %d, %Y")
+        expenses.append(exp)
     return jsonify({"expenses": expenses}), 200
+
 
 @app.route("/api/expenses", methods=["POST"])
 @jwt_required()
 def add_expense():
+    """
+    Expected JSON:
+    {
+      "title": "Grocery",
+      "category": "Food & Dining",
+      "amount": 12.5,
+      "description": "optional"
+    }
+    """
     user_id = get_jwt_identity()
     data = request.get_json()
-    if not data or "title" not in data or "amount" not in data:
-        return jsonify({"msg": "title and amount are required"}), 400
+    if not data:
+        return jsonify({"msg": "No input provided"}), 400
+
+    title = data.get("title", "").strip()
+    category = data.get("category", "").strip()
+    amount = data.get("amount")
+    description = data.get("description", "").strip() if data.get("description") else ""
+
+    if not title or not category or amount is None:
+        return jsonify({"msg": "title, category and amount are required"}), 400
+
+    try:
+        amount_val = float(amount)
+    except (ValueError, TypeError):
+        return jsonify({"msg": "amount must be a number"}), 400
 
     expense = {
         "user_id": user_id,
-        "title": data["title"],
-        "amount": float(data["amount"])
+        "title": title,
+        "category": category,
+        "amount": amount_val,
+        "description": description,
+        "date": datetime.utcnow()
     }
-    res = db["expenses"].insert_one(expense)
+    res = expenses_collection.insert_one(expense)
     expense["_id"] = str(res.inserted_id)
+    # format date for response
+    expense["date"] = expense["date"].strftime("%b %d, %Y")
     return jsonify({"msg": "Expense added", "expense": expense}), 201
+
 
 @app.route("/api/expenses/<expense_id>", methods=["DELETE"])
 @jwt_required()
 def delete_expense(expense_id):
     user_id = get_jwt_identity()
-    res = db["expenses"].delete_one({"_id": ObjectId(expense_id), "user_id": user_id})
+    try:
+        res = expenses_collection.delete_one({"_id": ObjectId(expense_id), "user_id": user_id})
+    except Exception:
+        return jsonify({"msg": "Invalid expense id"}), 400
+
     if res.deleted_count == 0:
         return jsonify({"msg": "Expense not found"}), 404
     return jsonify({"msg": "Expense deleted"}), 200
+
+
+@app.route("/api/expenses/<expense_id>", methods=["PUT"])
+@jwt_required()
+def update_expense(expense_id):
+    """
+    Partial or full update allowed. Provide any of: title, category, amount, description.
+    Example JSON:
+    {
+      "title": "new title",
+      "category": "Travel",
+      "amount": 30.0,
+      "description": "taxi"
+    }
+    """
+    user_id = get_jwt_identity()
+    data = request.get_json()
+    if not data:
+        return jsonify({"msg": "No input provided"}), 400
+
+    update_fields = {}
+    if "title" in data:
+        title = data.get("title", "").strip()
+        if title:
+            update_fields["title"] = title
+    if "category" in data:
+        category = data.get("category", "").strip()
+        if category:
+            update_fields["category"] = category
+    if "amount" in data:
+        try:
+            update_fields["amount"] = float(data.get("amount"))
+        except (ValueError, TypeError):
+            return jsonify({"msg": "amount must be a number"}), 400
+    if "description" in data:
+        update_fields["description"] = data.get("description", "").strip()
+
+    if not update_fields:
+        return jsonify({"msg": "No valid fields to update"}), 400
+
+    try:
+        res = expenses_collection.update_one(
+            {"_id": ObjectId(expense_id), "user_id": user_id},
+            {"$set": update_fields}
+        )
+    except Exception:
+        return jsonify({"msg": "Invalid expense id"}), 400
+
+    if res.matched_count == 0:
+        return jsonify({"msg": "Expense not found"}), 404
+
+    # Return the updated expense
+    expense = expenses_collection.find_one({"_id": ObjectId(expense_id)})
+    expense["_id"] = str(expense["_id"])
+    if isinstance(expense.get("date"), datetime):
+        expense["date"] = expense["date"].strftime("%b %d, %Y")
+    return jsonify({"msg": "Expense updated", "expense": expense}), 200
 
 
 # --------------------------

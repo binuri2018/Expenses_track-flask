@@ -40,6 +40,12 @@ export const deleteExpense = (token, id) => {
   });
 };
 
+export const updateExpense = (token, id, payload) => {
+  return axios.put(`${BASE_URL}/expenses/${id}`, payload, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+};
+
 export default {
   registerUser,
   loginUser,
@@ -47,4 +53,5 @@ export default {
   getExpenses,
   addExpense,
   deleteExpense,
+  updateExpense,
 };

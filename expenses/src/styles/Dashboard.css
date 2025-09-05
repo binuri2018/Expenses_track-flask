@@ -1,28 +1,148 @@
-.dashboard {
-  max-width: 600px;
-  margin: auto;
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #f9f9f9;
+/* Dashboard.css */
+
+/* General layout */
+.dashboard-container {
+  font-family: "Inter", sans-serif;
+  color: #f9fafb;
+  background: #111827; /* deep gray background */
+  min-height: 100vh;
+  padding: 2rem;
 }
 
-.expense-form input {
-  margin-right: 0.5rem;
-  padding: 0.3rem 0.5rem;
-}
-
-.expense-list li {
+/* Header */
+.dashboard-header {
   display: flex;
   justify-content: space-between;
-  padding: 0.3rem 0;
-  border-bottom: 1px solid #ddd;
+  align-items: center;
+  margin-bottom: 2rem;
 }
 
-.expense-list button {
-  background: red;
-  color: white;
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #22d3ee; /* teal accent */
+}
+
+.logout-btn {
+  background: #ef4444;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+}
+
+/* Card Styling */
+.card {
+  background: #1f2937;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+.card h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #facc15; /* yellow accent */
+}
+
+/* Form */
+.expense-form input,
+.expense-form select {
+  background: #374151;
+  color: #f9fafb;
   border: none;
-  padding: 0.2rem 0.5rem;
-  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.expense-form button {
+  background: #10b981; /* green */
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: 0.2s ease;
+}
+
+.expense-form button:hover {
+  background: #059669;
+}
+
+/* Table */
+.expenses-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.expenses-table th,
+.expenses-table td {
+  padding: 0.75rem;
+  text-align: left;
+}
+
+.expenses-table th {
+  background: #374151;
+  color: #d1d5db;
+  font-weight: 600;
+}
+
+.expenses-table tr:nth-child(even) {
+  background: #2d3748;
+}
+
+.expenses-table tr:hover {
+  background: #4b5563;
+  transition: background 0.2s ease;
+}
+
+/* Action buttons */
+.action-btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.4rem;
+  font-size: 0.875rem;
+  margin-right: 0.5rem;
+  transition: 0.2s ease;
+}
+
+.action-btn.edit {
+  background: #f59e0b;
+  color: #111827;
+}
+
+.action-btn.edit:hover {
+  background: #d97706;
+}
+
+.action-btn.delete {
+  background: #ef4444;
+}
+
+.action-btn.delete:hover {
+  background: #dc2626;
+}
+
+/* Summary */
+.summary-box {
+  background: #374151;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  text-align: center;
+  flex: 1;
+}
+
+.summary-box h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 0.25rem;
+}
+
+/* Charts */
+.chart-container {
+  background: #1f2937;
+  padding: 1rem;
+  border-radius: 0.75rem;
 }
