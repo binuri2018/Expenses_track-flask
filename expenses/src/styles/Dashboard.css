@@ -1,12 +1,10 @@
-/* Dashboard.css */
-
 /* General layout */
 .dashboard-container {
   font-family: "Inter", sans-serif;
   color: #f9fafb;
   background: #111827; /* deep gray background */
   min-height: 100vh;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 /* Header */
@@ -15,6 +13,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .dashboard-header h1 {
@@ -25,8 +25,9 @@
 
 .logout-btn {
   background: #ef4444;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 0.5rem;
+  font-weight: 500;
   transition: 0.2s ease;
 }
 
@@ -34,16 +35,21 @@
   background: #dc2626;
 }
 
-/* Card Styling */
-.card {
+/* Card Styling (form, summary, etc.) */
+.card,
+.summary-box,
+.expenses-table {
   background: #1f2937;
   padding: 1.5rem;
   border-radius: 1rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.card h2 {
+/* Section Titles */
+.card h2,
+.expenses-table h2,
+.summary-box h2 {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
@@ -51,20 +57,27 @@
 }
 
 /* Form */
+.expense-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
 .expense-form input,
 .expense-form select {
   background: #374151;
   color: #f9fafb;
   border: none;
-  padding: 0.5rem;
+  padding: 0.6rem 0.8rem;
   border-radius: 0.5rem;
-  margin-right: 0.5rem;
+  flex: 1 1 150px;
 }
 
 .expense-form button {
   background: #10b981; /* green */
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 0.5rem;
+  font-weight: 500;
   transition: 0.2s ease;
 }
 
@@ -72,16 +85,19 @@
   background: #059669;
 }
 
-/* Table */
-.expenses-table {
+/* Expenses Table */
+.expenses-table table {
   width: 100%;
   border-collapse: collapse;
+  overflow-x: auto;
+  display: block;
 }
 
 .expenses-table th,
 .expenses-table td {
-  padding: 0.75rem;
+  padding: 0.8rem;
   text-align: left;
+  white-space: nowrap;
 }
 
 .expenses-table th {
@@ -101,40 +117,59 @@
 
 /* Action buttons */
 .action-btn {
-  padding: 0.3rem 0.75rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 0.4rem;
-  font-size: 0.875rem;
-  margin-right: 0.5rem;
+  font-size: 0.85rem;
+  margin-right: 0.4rem;
   transition: 0.2s ease;
 }
 
-.action-btn.edit {
+.action-btn:first-child {
   background: #f59e0b;
   color: #111827;
 }
 
-.action-btn.edit:hover {
+.action-btn:first-child:hover {
   background: #d97706;
 }
 
-.action-btn.delete {
+.action-btn:last-child {
   background: #ef4444;
 }
 
-.action-btn.delete:hover {
+.action-btn:last-child:hover {
   background: #dc2626;
 }
 
-/* Summary */
+/* Summary Cards */
 .summary-box {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.summary-box .stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.summary-box .stat-card {
+  flex: 1 1 150px;
   background: #374151;
   padding: 1rem;
   border-radius: 0.75rem;
   text-align: center;
-  flex: 1;
+  min-width: 120px;
 }
 
-.summary-box h3 {
+.summary-box .stat-card p {
+  font-size: 0.9rem;
+  color: #d1d5db;
+}
+
+.summary-box .stat-card h3 {
   font-size: 1.5rem;
   font-weight: bold;
   margin-top: 0.25rem;
@@ -142,7 +177,42 @@
 
 /* Charts */
 .chart-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-top: 1rem;
+  justify-items: center;
+}
+
+.chart-container > div {
   background: #1f2937;
   padding: 1rem;
   border-radius: 0.75rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .expense-form {
+    flex-direction: column;
+  }
+
+  .expense-form input,
+  .expense-form select,
+  .expense-form button {
+    width: 100%;
+  }
+
+  .expenses-table table {
+    font-size: 0.9rem;
+  }
+
+  .summary-box .stats {
+    flex-direction: column;
+    align-items: center;
+  }
 }
