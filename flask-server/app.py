@@ -17,22 +17,24 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 
 mongo = PyMongo(app)
 jwt = JWTManager(app)
+
+# Enable CORS for specific origins (frontend URLs)
 CORS(app, origins=config.CORS_ORIGINS, supports_credentials=True)
 
-# Safe database access
+# Database collections
 db = mongo.cx.get_database()
 users_collection = db["users"]
 expenses_collection = db["expenses"]
 
 # --------------------------
-# Home / Health Check Route
+# Health Check
 # --------------------------
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({"msg": "Flask API is running"}), 200
 
 # --------------------------
-# Register
+# Auth: Register
 # --------------------------
 @app.route("/api/auth/register", methods=["POST"])
 def register():
@@ -58,7 +60,7 @@ def register():
     return jsonify({"msg": "User created", "access_token": access_token}), 201
 
 # --------------------------
-# Login
+# Auth: Login
 # --------------------------
 @app.route("/api/auth/login", methods=["POST"])
 def login():
@@ -81,17 +83,13 @@ def login():
     return jsonify({"msg": "Login successful", "access_token": access_token}), 200
 
 # --------------------------
-# Profile
+# Auth: Profile
 # --------------------------
 @app.route("/api/auth/profile", methods=["GET"])
 @jwt_required()
 def profile():
     user_id = get_jwt_identity()
-    try:
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
-    except Exception:
-        return jsonify({"msg": "User not found"}), 404
-
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
     if not user:
         return jsonify({"msg": "User not found"}), 404
 
@@ -103,39 +101,24 @@ def profile():
     return jsonify({"user": user_data}), 200
 
 # --------------------------
-# Expenses Routes
+# Expenses
 # --------------------------
 @app.route("/api/expenses", methods=["GET"])
 @jwt_required()
 def get_expenses():
-    """
-    Returns user's expenses sorted by date (newest first).
-    Dates are formatted as "Aug 22, 2025".
-    """
     user_id = get_jwt_identity()
     cursor = expenses_collection.find({"user_id": user_id}).sort("date", -1)
     expenses = []
     for exp in cursor:
         exp["_id"] = str(exp["_id"])
-        # If date stored as datetime, format it; otherwise return as-is
         if isinstance(exp.get("date"), datetime):
             exp["date"] = exp["date"].strftime("%b %d, %Y")
         expenses.append(exp)
     return jsonify({"expenses": expenses}), 200
 
-
 @app.route("/api/expenses", methods=["POST"])
 @jwt_required()
 def add_expense():
-    """
-    Expected JSON:
-    {
-      "title": "Grocery",
-      "category": "Food & Dining",
-      "amount": 12.5,
-      "description": "optional"
-    }
-    """
     user_id = get_jwt_identity()
     data = request.get_json()
     if not data:
@@ -164,10 +147,8 @@ def add_expense():
     }
     res = expenses_collection.insert_one(expense)
     expense["_id"] = str(res.inserted_id)
-    # format date for response
     expense["date"] = expense["date"].strftime("%b %d, %Y")
     return jsonify({"msg": "Expense added", "expense": expense}), 201
-
 
 @app.route("/api/expenses/<expense_id>", methods=["DELETE"])
 @jwt_required()
@@ -182,20 +163,9 @@ def delete_expense(expense_id):
         return jsonify({"msg": "Expense not found"}), 404
     return jsonify({"msg": "Expense deleted"}), 200
 
-
 @app.route("/api/expenses/<expense_id>", methods=["PUT"])
 @jwt_required()
 def update_expense(expense_id):
-    """
-    Partial or full update allowed. Provide any of: title, category, amount, description.
-    Example JSON:
-    {
-      "title": "new title",
-      "category": "Travel",
-      "amount": 30.0,
-      "description": "taxi"
-    }
-    """
     user_id = get_jwt_identity()
     data = request.get_json()
     if not data:
@@ -232,17 +202,15 @@ def update_expense(expense_id):
     if res.matched_count == 0:
         return jsonify({"msg": "Expense not found"}), 404
 
-    # Return the updated expense
     expense = expenses_collection.find_one({"_id": ObjectId(expense_id)})
     expense["_id"] = str(expense["_id"])
     if isinstance(expense.get("date"), datetime):
         expense["date"] = expense["date"].strftime("%b %d, %Y")
     return jsonify({"msg": "Expense updated", "expense": expense}), 200
 
-
 # --------------------------
 # Run Server
 # --------------------------
 if __name__ == "__main__":
     print("✅ Connected to MongoDB:", config.MONGO_URI)
-    app.run(debug=True, port=5000)
+    app.run(host="0.0.0.0", port=5000)
