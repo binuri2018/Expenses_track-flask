@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   getExpenses,
   addExpense,
@@ -26,34 +26,47 @@ export default function Dashboard({ token, onLogout }) {
   const [form, setForm] = useState({ title: "", category: "", amount: "" });
   const [editingId, setEditingId] = useState(null);
 
+  // ✅ Wrap in useCallback to satisfy useEffect dependency
+  const loadExpenses = useCallback(async () => {
+    try {
+      const res = await getExpenses(token);
+      setExpenses(res.data.expenses);
+    } catch (err) {
+      console.error("Failed to load expenses:", err);
+    }
+  }, [token]);
+
+  // ✅ useEffect now depends on stable function
   useEffect(() => {
-  loadExpenses();
-}, [loadExpenses]);
-
-
-  const loadExpenses = async () => {
-    const res = await getExpenses(token);
-    setExpenses(res.data.expenses);
-  };
+    loadExpenses();
+  }, [loadExpenses]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (editingId) {
-      await updateExpense(token, editingId, form);
-      setEditingId(null);
-    } else {
-      await addExpense(token, form);
+    try {
+      if (editingId) {
+        await updateExpense(token, editingId, form);
+        setEditingId(null);
+      } else {
+        await addExpense(token, form);
+      }
+      setForm({ title: "", category: "", amount: "" });
+      loadExpenses();
+    } catch (err) {
+      console.error("Failed to submit expense:", err);
     }
-    setForm({ title: "", category: "", amount: "" });
-    loadExpenses();
   };
 
   const handleDelete = async (id) => {
-    await deleteExpense(token, id);
-    loadExpenses();
+    try {
+      await deleteExpense(token, id);
+      loadExpenses();
+    } catch (err) {
+      console.error("Failed to delete expense:", err);
+    }
   };
 
   const handleEdit = (expense) => {
@@ -82,10 +95,7 @@ export default function Dashboard({ token, onLogout }) {
     <div className="dashboard-container">
       <header className="dashboard-header">
         <h1 className="text-3xl font-bold">💰 Expense Tracker</h1>
-        <button
-          onClick={onLogout}
-          className="logout-btn"
-        >
+        <button onClick={onLogout} className="logout-btn">
           Logout
         </button>
       </header>
@@ -125,10 +135,7 @@ export default function Dashboard({ token, onLogout }) {
             className="p-2 rounded bg-gray-700"
             required
           />
-          <button
-            type="submit"
-            className="bg-green-500 px-4 py-2 rounded-lg"
-          >
+          <button type="submit" className="bg-green-500 px-4 py-2 rounded-lg">
             {editingId ? "Update" : "Add"} Expense
           </button>
         </form>
@@ -154,16 +161,10 @@ export default function Dashboard({ token, onLogout }) {
                 <td>${e.amount}</td>
                 <td>{e.date}</td>
                 <td>
-                  <button
-                    onClick={() => handleEdit(e)}
-                    className="action-btn"
-                  >
+                  <button onClick={() => handleEdit(e)} className="action-btn">
                     Edit
                   </button>
-                  <button
-                    onClick={() => handleDelete(e._id)}
-                    className="action-btn"
-                  >
+                  <button onClick={() => handleDelete(e._id)} className="action-btn">
                     Delete
                   </button>
                 </td>
@@ -173,7 +174,7 @@ export default function Dashboard({ token, onLogout }) {
         </table>
       </div>
 
-      <div className="summary-box ">
+      <div className="summary-box">
         <h2 className="text-xl font-semibold mb-4">Expense Summary</h2>
         <div className="flex gap-6 mb-6">
           <div className="p-4 bg-gray-700 rounded-lg">
