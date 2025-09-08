@@ -27,8 +27,9 @@ export default function Dashboard({ token, onLogout }) {
   const [editingId, setEditingId] = useState(null);
 
   useEffect(() => {
-    loadExpenses();
-  }, []);
+  loadExpenses();
+}, [loadExpenses]);
+
 
   const loadExpenses = async () => {
     const res = await getExpenses(token);

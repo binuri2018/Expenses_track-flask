@@ -46,7 +46,7 @@ export const updateExpense = (token, id, payload) => {
   });
 };
 
-export default {
+const api = {
   registerUser,
   loginUser,
   fetchProfile,
@@ -55,3 +55,5 @@ export default {
   deleteExpense,
   updateExpense,
 };
+
+export default api;
