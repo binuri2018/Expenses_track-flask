@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "https://expenses-track-flask-1.onrender.com";
+// Make sure BASE_URL points to your backend root
+const BASE_URL = "https://expenses-track-flask-1.onrender.com/api";
 
 // -------------------
 // Auth routes
@@ -57,3 +58,4 @@ const api = {
 };
 
 export default api;
+
