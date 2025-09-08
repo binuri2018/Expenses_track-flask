@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://127.0.0.1:5000/api";
+const BASE_URL = "https://expenses-track-flask-1.onrender.com";
 
 // -------------------
 // Auth routes
