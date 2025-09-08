@@ -1,8 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
-from flask_jwt_extended import (
-    JWTManager, create_access_token, jwt_required, get_jwt_identity
-)
+from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
@@ -18,7 +16,10 @@ app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=1)
 mongo = PyMongo(app)
 jwt = JWTManager(app)
 
-# Enable CORS for specific origins (frontend URLs)
+# -----------------------------
+# CORS CONFIGURATION
+# -----------------------------
+# Allow multiple frontends
 CORS(app, origins=config.CORS_ORIGINS, supports_credentials=True)
 
 # Database collections
@@ -26,16 +27,16 @@ db = mongo.cx.get_database()
 users_collection = db["users"]
 expenses_collection = db["expenses"]
 
-# --------------------------
+# -----------------------------
 # Health Check
-# --------------------------
+# -----------------------------
 @app.route("/", methods=["GET"])
 def home():
     return jsonify({"msg": "Flask API is running"}), 200
 
-# --------------------------
-# Auth: Register
-# --------------------------
+# -----------------------------
+# Auth Routes
+# -----------------------------
 @app.route("/api/auth/register", methods=["POST"])
 def register():
     data = request.get_json()
@@ -59,9 +60,6 @@ def register():
     access_token = create_access_token(identity=user_id)
     return jsonify({"msg": "User created", "access_token": access_token}), 201
 
-# --------------------------
-# Auth: Login
-# --------------------------
 @app.route("/api/auth/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -82,9 +80,6 @@ def login():
     access_token = create_access_token(identity=user_id)
     return jsonify({"msg": "Login successful", "access_token": access_token}), 200
 
-# --------------------------
-# Auth: Profile
-# --------------------------
 @app.route("/api/auth/profile", methods=["GET"])
 @jwt_required()
 def profile():
@@ -93,16 +88,17 @@ def profile():
     if not user:
         return jsonify({"msg": "User not found"}), 404
 
-    user_data = {
-        "id": str(user["_id"]),
-        "username": user.get("username"),
-        "email": user.get("email"),
-    }
-    return jsonify({"user": user_data}), 200
+    return jsonify({
+        "user": {
+            "id": str(user["_id"]),
+            "username": user.get("username"),
+            "email": user.get("email"),
+        }
+    }), 200
 
-# --------------------------
-# Expenses
-# --------------------------
+# -----------------------------
+# Expenses Routes
+# -----------------------------
 @app.route("/api/expenses", methods=["GET"])
 @jwt_required()
 def get_expenses():
@@ -208,9 +204,9 @@ def update_expense(expense_id):
         expense["date"] = expense["date"].strftime("%b %d, %Y")
     return jsonify({"msg": "Expense updated", "expense": expense}), 200
 
-# --------------------------
+# -----------------------------
 # Run Server
-# --------------------------
+# -----------------------------
 if __name__ == "__main__":
     print("✅ Connected to MongoDB:", config.MONGO_URI)
     app.run(host="0.0.0.0", port=5000)
