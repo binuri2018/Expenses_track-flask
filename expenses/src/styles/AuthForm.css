@@ -1,28 +1,99 @@
+/* Page background */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0f172a; /* dark navy */
+}
 
-.auth-form { 
-  display:flex; 
-  flex-direction: column; 
-  gap: 10px; 
-  margin-top: 8px;
- }
+/* Card */
+.login-card {
+  background: #1e293b;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.3);
+  max-width: 380px;
+  width: 100%;
+  text-align: center;
+}
+
+/* Title & Subtitle */
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #fff;
+}
+.login-subtitle {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-bottom: 20px;
+}
+
+/* Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: left;
+}
+
+.auth-form label {
+  font-size: 14px;
+  color: #e2e8f0;
+  margin-bottom: -8px;
+}
 
 .auth-form input {
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #ffffff;
+  color: #fff;
+  font-size: 14px;
 }
-.auth-form button {
-  padding: 10px;
-  border-radius: 6px;
+
+.auth-form input::placeholder {
+  color: #94a3b8;
+}
+
+/* Button */
+.signin-btn {
+  padding: 12px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  background: #0b6cff;
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
   color: white;
   font-weight: 600;
+  transition: background 0.3s;
 }
+
+.signin-btn:hover {
+  background: linear-gradient(90deg, #1d4ed8, #1e40af);
+}
+
+/* Error */
 .error {
   background: #ffefef;
   color: #a40b0b;
-  padding: 8px;
+  padding: 10px;
   border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Signup link */
+.signup-text {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
+.signup-text a {
+  color: #3b82f6;
+  text-decoration: none;
+  font-weight: 500;
+}
+.signup-text a:hover {
+  text-decoration: underline;
 }

@@ -18,12 +18,8 @@ export default function Login({ onLogin }) {
     try {
       const res = await loginUser(form);
 
-      // Adjust depending on your Flask response
       const token = res.data.access_token || res.data.token;
-
-      if (!token) {
-        throw new Error("No token received from server");
-      }
+      if (!token) throw new Error("No token received from server");
 
       onLogin(token);
     } catch (err) {
@@ -36,28 +32,41 @@ export default function Login({ onLogin }) {
   };
 
   return (
-    <form className="auth-form" onSubmit={submit}>
-      {msg && <div className="error">{msg}</div>}
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">Welcome Back</h2>
+        <p className="login-subtitle">Sign in to your account</p>
 
-      <input
-        type="email"
-        name="email"
-        value={form.email}
-        onChange={handleChange}
-        placeholder="Email"
-        required
-      />
+        <form className="auth-form" onSubmit={submit}>
+          {msg && <div className="error">{msg}</div>}
 
-      <input
-        type="password"
-        name="password"
-        value={form.password}
-        onChange={handleChange}
-        placeholder="Password"
-        required
-      />
+          <label>Email Address</label>
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="admin@example.com"
+            required
+          />
 
-      <button type="submit">Login</button>
-    </form>
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="••••••••"
+            required
+          />
+
+          <button type="submit" className="signin-btn">Sign In</button>
+        </form>
+
+        <p className="signup-text">
+          Don’t have an account? <a href="/register">Sign up here</a>
+        </p>
+      </div>
+    </div>
   );
 }
