@@ -14,7 +14,7 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  Legend,
+  ResponsiveContainer,
 } from "recharts";
 import "../styles/Dashboard.css";
 
@@ -26,7 +26,7 @@ export default function Dashboard({ token, onLogout }) {
   const [form, setForm] = useState({ title: "", category: "", amount: "" });
   const [editingId, setEditingId] = useState(null);
 
-  // ✅ Wrap in useCallback to satisfy useEffect dependency
+  // ✅ Load expenses
   const loadExpenses = useCallback(async () => {
     try {
       const res = await getExpenses(token);
@@ -36,7 +36,6 @@ export default function Dashboard({ token, onLogout }) {
     }
   }, [token]);
 
-  // ✅ useEffect now depends on stable function
   useEffect(() => {
     loadExpenses();
   }, [loadExpenses]);
@@ -100,6 +99,7 @@ export default function Dashboard({ token, onLogout }) {
         </button>
       </header>
 
+      {/* ✅ Add Expense Form */}
       <div className="card">
         <h2 className="text-xl font-semibold mb-4">Add New Expense</h2>
         <form onSubmit={handleSubmit} className="expense-form">
@@ -141,6 +141,7 @@ export default function Dashboard({ token, onLogout }) {
         </form>
       </div>
 
+      {/* ✅ Expenses Table */}
       <div className="expenses-table">
         <h2 className="text-xl font-semibold mb-4">Your Expenses</h2>
         <table className="w-full text-left">
@@ -164,7 +165,10 @@ export default function Dashboard({ token, onLogout }) {
                   <button onClick={() => handleEdit(e)} className="action-btn">
                     Edit
                   </button>
-                  <button onClick={() => handleDelete(e._id)} className="action-btn">
+                  <button
+                    onClick={() => handleDelete(e._id)}
+                    className="action-btn"
+                  >
                     Delete
                   </button>
                 </td>
@@ -174,6 +178,7 @@ export default function Dashboard({ token, onLogout }) {
         </table>
       </div>
 
+      {/* ✅ Summary + Charts */}
       <div className="summary-box">
         <h2 className="text-xl font-semibold mb-4">Expense Summary</h2>
         <div className="flex gap-6 mb-6">
@@ -191,35 +196,72 @@ export default function Dashboard({ token, onLogout }) {
           </div>
         </div>
 
+        {/* ✅ Charts */}
         <div className="chart-container">
-          <PieChart width={300} height={300}>
-            <Pie
-              data={categoryData}
-              cx={150}
-              cy={150}
-              innerRadius={60}
-              outerRadius={100}
-              paddingAngle={5}
-              dataKey="value"
-            >
-              {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
+          {/* Pie Chart */}
+          <ResponsiveContainer width={300} height={300}>
+            <PieChart>
+              <Pie
+                data={categoryData}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={5}
+                dataKey="value"
+              >
+                {categoryData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `$${value}`} />
+            </PieChart>
+          </ResponsiveContainer>
 
-          <BarChart width={400} height={300} data={categoryData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="value">
-              {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Bar>
-          </BarChart>
+          {/* Bar Chart */}
+          <div style={{ width: "500px", height: "350px" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={categoryData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+              >
+                <XAxis dataKey="name" angle={-30} textAnchor="end" interval={0} />
+                <YAxis tickFormatter={(value) => `$${value}`} />
+                <Tooltip formatter={(value) => `$${value}`} />
+                <Bar dataKey="value" radius={[6, 6, 0, 0]} barSize={60}>
+                  {categoryData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          {/* ✅ Custom Legend */}
+            <div className="legend-container mt-4">
+              <h3 className="font-semibold mb-2">Category Colors</h3>
+              <ul className="flex flex-wrap gap-4">
+                {categoryData.map((entry, index) => (
+                  <li key={index} className="flex items-center gap-2">
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "16px",
+                        height: "16px",
+                        backgroundColor: COLORS[index % COLORS.length],
+                        borderRadius: "3px",
+                      }}
+                    ></span>
+                    {entry.name}
+                  </li>
+                ))}
+              </ul>
+            </div>
         </div>
       </div>
     </div>
