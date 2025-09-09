@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_pymongo import PyMongo
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
+from config import CORS_ORIGINS
 from bson.objectid import ObjectId
 from datetime import datetime, timedelta
 
@@ -20,7 +21,7 @@ jwt = JWTManager(app)
 # CORS CONFIGURATION
 # -----------------------------
 # Allow multiple frontends
-CORS(app, origins=config.CORS_ORIGINS, supports_credentials=True)
+CORS(app, resources={r"/api/*": {"origins": CORS_ORIGINS}}, supports_credentials=True)
 
 # Database collections
 db = mongo.cx.get_database()
