@@ -1,28 +1,33 @@
-/* General layout */
+/* ======================
+   General Layout
+====================== */
 .dashboard-container {
   font-family: "Inter", sans-serif;
   color: #f9fafb;
-  background: #0f172a; /* darker navy background */
+  background: #0f172a;
   min-height: 100vh;
   padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-/* Header */
+/* ======================
+   Header
+====================== */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2rem;
   flex-wrap: wrap;
   gap: 1rem;
 }
-
 .dashboard-header h1 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #facc15; /* gold icon text */
+  color: #facc15;
 }
-
 .logout-btn {
   background: #ef4444;
   padding: 0.6rem 1.2rem;
@@ -35,10 +40,9 @@
   background: #dc2626;
 }
 
-/* Welcome text section */
-.welcome-text {
-  margin-bottom: 1.5rem;
-}
+/* ======================
+   Welcome
+====================== */
 .welcome-text h2 {
   font-size: 2rem;
   font-weight: 700;
@@ -50,34 +54,34 @@
   font-size: 0.95rem;
 }
 
-/* Card Styling (form, summary, tables, charts) */
+/* ======================
+   Cards
+====================== */
 .card,
 .summary-box,
 .expenses-table {
   background: #1e293b;
   padding: 1.5rem;
   border-radius: 0.75rem;
-  margin-bottom: 1.5rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
-
-/* Section Titles */
 .card h2,
-.expenses-table h2,
-.summary-box h2 {
+.summary-box h2,
+.expenses-table h2 {
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: 1rem;
   color: #fff;
 }
 
-/* Form */
+/* ======================
+   Form
+====================== */
 .expense-form {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
-
 .expense-form input,
 .expense-form select {
   background: #0f172a;
@@ -87,11 +91,9 @@
   border-radius: 0.5rem;
   font-size: 0.95rem;
 }
-
 .expense-form input::placeholder {
   color: #64748b;
 }
-
 .expense-form button {
   background: #22c55e;
   padding: 0.75rem;
@@ -104,15 +106,22 @@
   background: #16a34a;
 }
 
-/* Expenses Table */
+/* ======================
+   Expenses Table
+====================== */
+.expenses-table {
+  overflow-x: auto; /* ✅ enable horizontal scroll on small screens */
+}
 .expenses-table table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px; /* ✅ prevents breaking */
 }
 .expenses-table th,
 .expenses-table td {
   padding: 0.9rem;
   text-align: left;
+  white-space: nowrap; /* ✅ keeps text inline */
 }
 .expenses-table th {
   color: #cbd5e1;
@@ -123,14 +132,6 @@
 }
 .expenses-table tr:hover {
   background: #334155;
-}
-
-/* Category badges in table */
-.expenses-table td:nth-child(2) {
-  padding: 0.6rem 0.8rem;
-  border-radius: 0.5rem;
-  font-size: 0.95rem;
-  font-weight: 500;
 }
 
 /* Action buttons */
@@ -156,25 +157,22 @@
   background: #dc2626;
 }
 
-/* Summary Section */
-
+/* ======================
+   Summary Section
+====================== */
 .summary-box {
   margin-top: 2rem;
 }
 
-.summary-box h2 {
-  margin-bottom: 1.2rem;
-}
-
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1.2rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
 }
 
 .stat-card {
   background: #1e293b;
-  padding: 1.2rem;
+  padding: 1rem;
   border-radius: 0.75rem;
   text-align: center;
   transition: transform 0.2s ease;
@@ -186,45 +184,72 @@
 }
 
 .stat-card p {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #94a3b8;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.25rem;
 }
 
 .stat-card h3 {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #f9fafb;
 }
 
-
-/* Charts */
+/* ======================
+   Charts Section
+====================== */
 .chart-container {
-  display: grid ;
-  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-  gap: 2rem;
-  margin-top: 1rem;
-  padding-top: 40px;
-  justify-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
 }
+
 .chart-container > div {
+  flex: 1 1 320px; 
+  max-width: 500px; 
   background: #0f172a;
-  padding: 1rem;
+  padding: 0.5rem;
   border-radius: 0.75rem;
 }
 
-
-
-/* Mobile adjustments */
+/* ======================
+   Mobile Responsive
+====================== */
 @media (max-width: 768px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+  /* Summary: stack cards full width */
   .stats {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
-  .expenses-table table {
-    font-size: 0.85rem;
+
+  .stat-card h3 {
+    font-size: 1.2rem;
+  }
+
+  /* Charts: stack vertically and shrink */
+  .chart-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .chart-container > div {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Extra small screens */
+  .stat-card {
+    padding: 0.8rem;
+  }
+
+  .stat-card h3 {
+    font-size: 1rem;
+  }
+
+  .chart-container > div {
+    padding: 0.5rem;
   }
 }
