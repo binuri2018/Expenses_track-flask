@@ -11,7 +11,5 @@ JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "AB2018")
 # Split multiple origins by comma and strip spaces
 CORS_ORIGINS = [origin.strip() for origin in os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:3000",
-    "https://flsexpense.netlify.app",
-    "https://expenses-track-flask-2.onrender.com"
+    "http://localhost:3000","https://flsexpense.netlify.app,https://expenses-track-flask-2.onrender.com"
 ).split(",")]
